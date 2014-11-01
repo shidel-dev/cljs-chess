@@ -127,7 +127,7 @@
 (defn make-or-present-move [cords]
   (let [cell (get-in @board-state cords)]
     (cond
-      (and (empty? cell) (not= false @selected-piece)) (make-or-reject-move cell cords)
+      (and (or (= (opp-color (:color @selected-piece)) (:color cell)) (empty? cell)) (not= false @selected-piece)) (make-or-reject-move cell cords)
       (and (not (empty? cell)) (= @current-turn (:color cell))) (highlight-moves cell cords))))
 
 ;; display logic --------------------------------------------------
