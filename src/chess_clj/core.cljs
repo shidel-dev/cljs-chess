@@ -42,13 +42,19 @@
 
 (defn change-turns [] (swap! board-state #(map reverse (reverse %))))
 
+(def opp-color {:black :white :white :black})
+
 (defn rel-cords [cords]
   (if (= @current-turn :black) cords
     (let [[x y] cords] [(js/Math.abs (- x 7)), (js/Math.abs (- y 7))])))
 
-(defn not-nil-or-empty [board cords]
-  (and (not= nil (get-in board cords)) (empty? (get-in board cords))))
-
+(defn take-while-valid [cords]
+  (let [[head tail]
+    (split-with
+      (fn [cord]
+       (let [cell (get-in @board-state cord)]
+         (and (empty? cell) (not= nil cell)))) cords)]
+    (if (empty? tail) head  (conj head (first tail)))))
 
 ;; click stream ---------------------------------------------------
 
@@ -74,17 +80,22 @@
 
 ;; game logic ------------------------------------------------------
 
-(defn take-while-valid [cords]
-   (take-while (fn [cord] (not-nil-or-empty @board-state cord)) cords))
+(defn pawn-corner-attacks [cell cords]
+  (for [corner [[(inc (first cords)) (inc (second cords))] [(inc (first cords)) (dec (second cords))]]
+        :when (= (opp-color (:color cell)) (:color (get-in @board-state corner)))]
+    corner))
 
 (defn pawn-moves [cell cords]
-  (take-while-valid
+  (into (pawn-corner-attacks cell cords)
+   (filter #(let [c (get-in @board-state %)] (and (empty? c) (not= nil c)))
     (let [[y x] cords]
       (if (:first-move cell) [[(inc y) x] [(+ 2 y) x]]
-        [(inc y) x]))))
+        [[(inc y) x]])))))
 
 (defn knight-moves [cell cords]
-    (filter (fn [cord] (not-nil-or-empty @board-state cord))
+    (filter
+      #(let [c (get-in @board-state %)]
+        (and (not= nil c) (not= (:color c) (:color cell))))
       (doall
         (for [x [-1 -2 1 2]
               y [-1 -2 1 2]
@@ -97,12 +108,11 @@
 (defn make-move [cell cords]
   (swap! board-state (fn [board]
     (-> board
-        (assoc-in cords (dissoc @selected-piece :position))
-        (assoc-in (:position @selected-piece {})))))
+        (assoc-in cords (dissoc @selected-piece :position :first-move))
+        (assoc-in (:position @selected-piece) {}))))
   (swap! selected-piece (fn [p] false)))
 
 (defn make-or-reject-move [cell cords]
-  (println [cell cords])
   (if (some #{cords} (get-moves @selected-piece (:position @selected-piece)))
     (make-move cell cords))
   (render-board-state))
