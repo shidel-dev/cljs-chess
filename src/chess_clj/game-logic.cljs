@@ -47,7 +47,7 @@
       [(+ y (first cords)) (+ x (second cords))]))))
 
 (defn rook-moves [cell cords]
-  (reduce into
+  (apply concat
     (filter (complement empty?)
       (map take-while-valid
         (let [y-val (fn [y] [y (second cords)])
@@ -56,7 +56,7 @@
            (map x-val (range (dec (second cords)) -1 -1)) (map x-val (range (inc (second cords)) 8))])))))
 
 (defn bishop-moves [cell cords]
-  (reduce into
+  (apply concat
     (filter (complement empty?)
       (map take-while-valid
         (for [m [[1 1] [-1 1] [1 -1] [-1 -1]]]
@@ -105,6 +105,7 @@
 
 (defn make-or-present-move [cords]
   (let [cell (get-in @values/board-state cords)]
+    (println @values/board-state)
     (cond
       (and (or (= (opp-color (:color @values/selected-piece)) (:color cell)) (empty? cell)) (not= false @values/selected-piece)) (make-or-reject-move cell cords)
       (and (not (empty? cell)) (= @values/current-turn (:color cell))) (highlight-moves cell cords))))
