@@ -6,7 +6,6 @@
                  [org.clojure/clojurescript "0.0-2311"]
                  [prismatic/dommy "1.0.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [net.mikera/core.matrix "0.31.1"]
                  [com.cemerick/piggieback "0.1.3"]]
 
   :repl-options  {:nrepl-middleware  [cemerick.piggieback/wrap-cljs-repl]}
