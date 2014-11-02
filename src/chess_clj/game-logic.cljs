@@ -91,7 +91,8 @@
     (-> board
         (assoc-in cords (dissoc @values/selected-piece :position :first-move))
         (assoc-in (:position @values/selected-piece) {}))))
-  (swap! values/selected-piece (fn [p] false)))
+  (swap! values/selected-piece (fn [p] false))
+  (values/change-turns))
 
 (defn make-or-reject-move [cell cords]
   (if (some #{cords} (get-moves @values/selected-piece (:position @values/selected-piece)))
@@ -99,7 +100,6 @@
   (view/render-board-state))
 
 (defn highlight-moves [cell cords]
-  (println (get-moves cell cords))
   (swap! values/selected-piece #(assoc (get-in @values/board-state cords) :position cords))
   (go (>! highlight-chan (get-moves cell cords))))
 

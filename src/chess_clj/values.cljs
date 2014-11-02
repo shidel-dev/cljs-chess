@@ -12,4 +12,8 @@
 
 (def current-turn (atom :white))
 
-(def selected-piece (atom false)) 
+(def selected-piece (atom false))
+
+(defn change-turns []
+  (swap! board-state #(into [] (reverse (map (fn [row] (into [] (reverse row))) %))))
+  (swap! current-turn #(if (= :white %) :black :white)))

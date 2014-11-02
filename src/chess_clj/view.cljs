@@ -14,8 +14,7 @@
   (str "<a href='#' class='" (name piece) " " (name color) "'>" (get-in piece-codes [piece color]) "</a>")) 
 
 (defn rel-cords [cords]
-  (if (= @values/current-turn :black) cords
-    (let [[x y] cords] [(js/Math.abs (- x 7)), (js/Math.abs (- y 7))])))
+  (let [[x y] cords] [(js/Math.abs (- x 7)), (js/Math.abs (- y 7))]))
 
 ;; sends the cell cords through chan on a click
 (defn piece-click-handler [cell c]
